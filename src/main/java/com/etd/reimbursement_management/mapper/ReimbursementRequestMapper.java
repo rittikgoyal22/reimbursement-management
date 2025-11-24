@@ -65,6 +65,7 @@ public class ReimbursementRequestMapper {
         logger.info("Inside Reimbursement Request Mapper :: mapProcessedRequestToReimbursement");
         return ReimbursementRequest
                 .builder()
+                .id(reimbursementRequest.getId())
                 .travelRequestId(reimbursementRequest.getTravelRequestId())
                 .requestRaisedByEmployeeId(reimbursementRequest.getRequestRaisedByEmployeeId())
                 .requestDate(reimbursementRequest.getRequestDate())

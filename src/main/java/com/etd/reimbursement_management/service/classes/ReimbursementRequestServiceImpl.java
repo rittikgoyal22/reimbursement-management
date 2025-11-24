@@ -53,6 +53,7 @@ import static com.etd.reimbursement_management.constant.AppConstant.RAISED_BY_EM
 import static com.etd.reimbursement_management.constant.AppConstant.REIMBURSEMENT_ID;
 import static com.etd.reimbursement_management.constant.AppConstant.REIMBURSEMENT_NOT_FOUND;
 import static com.etd.reimbursement_management.constant.AppConstant.REIMBURSEMENT_NOT_FOUND_FOR_TRAVEL_REQUEST_ID;
+import static com.etd.reimbursement_management.constant.AppConstant.REIMBURSEMENT_REQUEST_ALREADY_PROCESSED;
 import static com.etd.reimbursement_management.constant.AppConstant.REIMBURSEMENT_TYPE_ID;
 import static com.etd.reimbursement_management.constant.AppConstant.REIMBURSEMENT_TYPE_NOT_FOUND;
 import static com.etd.reimbursement_management.constant.AppConstant.REJECTED;
@@ -272,6 +273,10 @@ public class ReimbursementRequestServiceImpl implements ReimbursementRequestServ
         String remarks = processReimbursementDTO.getRemarks();
         validateStatusAndRemarks(status, remarks);
         ReimbursementRequest reimbursementRequest = reimbursementRequsetRepo.findById(reimbursementId).orElseThrow(()-> new NotFoundException(messageSource.getMessage(REIMBURSEMENT_NOT_FOUND, new Object[]{reimbursementId}, Locale.ENGLISH), REIMBURSEMENT_ID));
+        if(statuses.contains(reimbursementRequest.getStatus()))
+        {
+            throw new IllegalArgumentException(messageSource.getMessage(REIMBURSEMENT_REQUEST_ALREADY_PROCESSED, new Object[]{reimbursementRequest.getRequestProcessedOn().toString().substring(0,10)}, Locale.ENGLISH), STATUS);
+        }
 
         validateRole(processReimbursementDTO.getRequestProcessedByEmployeeId());
         ReimbursementRequest reimbursement = reimbursementRequestMapper.mapProcessedRequestToReimbursement(processReimbursementDTO, reimbursementRequest);

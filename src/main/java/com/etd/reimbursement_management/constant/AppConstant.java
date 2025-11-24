@@ -19,6 +19,7 @@ public class AppConstant {
     public static final String INVALID_STATUS = "invalid.status";
     public static final String EMPTY_REMARKS = "empty.remarks";
     public static final String INVALID_TRAVEL_DESK_EXEC_ID = "invalid.travel.desk.exe.id";
+    public static final String REIMBURSEMENT_REQUEST_ALREADY_PROCESSED = "reimbursement.request.already.processed";
 
     //General Properties
     public static final String TRAVEL_REQUEST_ID = "Travel Request Id";
