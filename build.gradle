@@ -10,7 +10,7 @@ description = 'Reimbursement Management Project'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(25)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -37,7 +37,9 @@ dependencies {
     //for feign client
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     //for mysql database
-    runtimeOnly 'com.mysql:mysql-connector-j'
+//    runtimeOnly 'com.mysql:mysql-connector-j'
+    //for h2 database
+    runtimeOnly 'com.h2database:h2'
     //for testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
