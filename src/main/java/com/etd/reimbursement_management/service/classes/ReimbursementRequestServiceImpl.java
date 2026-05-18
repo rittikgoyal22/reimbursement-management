@@ -222,7 +222,7 @@ public class ReimbursementRequestServiceImpl implements ReimbursementRequestServ
             travelRequest = travelPlannerClient
                     .getTravelRequestDetailByTravelRequestId(travelRequestId);
         }
-        catch (Exception _)
+        catch (Exception ex)
         {
             throwTravelRequestNotFound(travelRequestId);
         }
@@ -304,7 +304,7 @@ public class ReimbursementRequestServiceImpl implements ReimbursementRequestServ
                 throw new BadRequestException(messageSource.getMessage(INVALID_TRAVEL_DESK_EXEC_ID, null, Locale.ENGLISH), REQUEST_PROCESSED_BY_EMP_ID);
             }
         }
-        catch(Exception _)
+        catch(Exception ex)
         {
             throw new BadRequestException(messageSource.getMessage(INVALID_TRAVEL_DESK_EXEC_ID, null, Locale.ENGLISH), REQUEST_PROCESSED_BY_EMP_ID);
         }
