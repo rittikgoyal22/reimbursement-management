@@ -20,12 +20,13 @@ public class AppConstant {
     public static final String EMPTY_REMARKS = "empty.remarks";
     public static final String INVALID_TRAVEL_DESK_EXEC_ID = "invalid.travel.desk.exe.id";
     public static final String REIMBURSEMENT_REQUEST_ALREADY_PROCESSED = "reimbursement.request.already.processed";
+    public static final String INVALID_PDF_FORMAT = "invalid.pdf.format";
 
     //General Properties
     public static final String TRAVEL_REQUEST_ID = "Travel Request Id";
     public static final String REIMBURSEMENT_ID = "Reimbursement Id";
     public static final String UNDERSCORE = "_";
-    public static final String STATIC = "static";
+    public static final String PDF_FILE = "pdfFile";
     public static final String REIMBURSEMENT_TYPE_ID = "Reimbursement Type Id";
     public static final String NEW = "New";
     public static final String FROM_DATE = "fromDate";

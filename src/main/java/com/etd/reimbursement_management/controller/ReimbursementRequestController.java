@@ -7,6 +7,7 @@ import com.etd.reimbursement_management.service.interfaces.ReimbursementRequestS
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/reimbursements/")
+@RequestMapping("api/reimbursements")
+@CrossOrigin
 public class ReimbursementRequestController {
 
     private final Logger logger = LoggerFactory.getLogger(ReimbursementRequestController.class);
@@ -30,7 +32,7 @@ public class ReimbursementRequestController {
         this.reimbursementRequestService = reimbursementRequestService;
     }
 
-    @GetMapping("{travelRequestId}/requests")
+    @GetMapping("/{travelRequestId}/requests")
     public ResponseEntity<List<ReimbursementResponseDTO>> getAllReimbursementsByTravelRequestId(@PathVariable("travelRequestId") Long travelRequestId)
     {
         logger.info("Inside Reimbursement Request Controller :: getAllReimbursementsByTravelRequestId");
@@ -38,7 +40,7 @@ public class ReimbursementRequestController {
         return ResponseEntity.ok(reimbursements);
     }
 
-    @GetMapping("{reimbursementId}")
+    @GetMapping("/{reimbursementId}")
     public ResponseEntity<ReimbursementResponseDTO> getReimbursementByReimbursementId(@PathVariable("reimbursementId") Long reimbursementId)
     {
         logger.info("Inside Reimbursement Request Controller :: getReimbursementByReimbursementId");
@@ -46,7 +48,7 @@ public class ReimbursementRequestController {
         return ResponseEntity.ok(reimbursement);
     }
 
-    @PostMapping(path = "add", consumes = "multipart/form-data")
+    @PostMapping(path = "/add", consumes = "multipart/form-data")
     public ResponseEntity<ReimbursementResponseDTO> addReimbursement(@RequestPart("reimbursementRequestDTO") ReimbursementRequestDTO reimbursementRequestDTO, @RequestPart("pdfFile") MultipartFile pdfFile)
     {
         logger.info("Inside Reimbursement Request Controller :: addReimbursement");
@@ -54,7 +56,7 @@ public class ReimbursementRequestController {
         return ResponseEntity.ok(reimbursement);
     }
 
-    @PutMapping("{reimbursementId}/process")
+    @PutMapping("/{reimbursementId}/process")
     public ResponseEntity<ReimbursementResponseDTO> processReimbursement(@PathVariable("reimbursementId") Long reimbursementId, @RequestBody ProcessReimbursementDTO processReimbursementDTO)
     {
         logger.info("Inside Reimbursement Request Controller :: processReimbursement");
