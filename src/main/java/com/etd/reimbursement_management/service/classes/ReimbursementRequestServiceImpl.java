@@ -68,9 +68,12 @@ import static com.etd.reimbursement_management.constant.AppConstant.STATUS;
 import static com.etd.reimbursement_management.constant.AppConstant.TO_DATE;
 import static com.etd.reimbursement_management.constant.AppConstant.TRAVEL_DESK_EXE;
 import static com.etd.reimbursement_management.constant.AppConstant.TRAVEL_REQUEST_ID;
+import static com.etd.reimbursement_management.constant.AppConstant.TRAVEL_REQUEST_APPROVED_STATUS;
+import static com.etd.reimbursement_management.constant.AppConstant.TRAVEL_REQUEST_NOT_APPROVED;
 import static com.etd.reimbursement_management.constant.AppConstant.TRAVEL_REQUEST_NOT_FOUND;
 import static com.etd.reimbursement_management.constant.AppConstant.UNDERSCORE;
 import static com.etd.reimbursement_management.constant.AppConstant.WATER;
+import static com.etd.reimbursement_management.constant.AppConstant.REQUEST_STATUS;
 
 @Service
 public class ReimbursementRequestServiceImpl implements ReimbursementRequestService {
@@ -102,6 +105,15 @@ public class ReimbursementRequestServiceImpl implements ReimbursementRequestServ
 
     private static final long MAX_PDF_SIZE = 262144;
     private static final List<String> VALID_STATUSES = List.of(APPROVED, REJECTED);
+
+    @Override
+    public List<ReimbursementResponseDTO> getMyReimbursements() {
+        logger.info("Inside Reimbursement Request Service Impl :: getMyReimbursements");
+        ObjectNode employee = accountManagementClient.getMyEmployee();
+        Long employeeId = employee.get("employeeId").asLong();
+        List<ReimbursementRequest> reimbursements = reimbursementRequsetRepo.findByRequestRaisedByEmployeeId(employeeId);
+        return reimbursementRequestMapper.mapListOfReimbursementToListOfReimbursementResponseDTO(reimbursements);
+    }
 
     @Override
     public List<ReimbursementResponseDTO> getAllReimbursementsByTravelRequestId(Long travelRequestId) {
@@ -140,17 +152,20 @@ public class ReimbursementRequestServiceImpl implements ReimbursementRequestServ
         ObjectNode travelRequest = getTravelRequest(dto.getTravelRequestId());
         validateTravelRequestEmployeeId(travelRequest.get(RAISED_BY_EMPLOYEE_ID).asLong(), dto.getRequestRaisedByEmployeeId());
 
-        // 4. Validate invoice date is within travel request date range
+        // 4. Travel request must be APPROVED before a reimbursement can be raised
+        validateTravelRequestApproved(travelRequest, dto.getTravelRequestId());
+
+        // 5. Validate invoice date is within travel request date range
         validateInvoiceDate(dto.getInvoiceDate(), travelRequest);
 
-        // 5. Budget validation against previous requests for the same date
+        // 6. Budget validation against previous requests for the same date
         List<ReimbursementRequest> previousRequests = reimbursementRequsetRepo.findByTravelRequestId(dto.getTravelRequestId());
         long prevFoodWater = calculatePreviousAmount(previousRequests, dto, FOOD, WATER);
         long prevLaundry = calculatePreviousAmount(previousRequests, dto, LAUNDRY);
         long prevLocalTravel = calculatePreviousAmount(previousRequests, dto, LOCAL_TRAVEL);
         validateBudgetAndAmount(dto, reimbursementType, prevFoodWater, prevLaundry, prevLocalTravel);
 
-        // 6. Save DB record and PDF file atomically
+        // 7. Save DB record and PDF file atomically
         String uniqueFileName = System.currentTimeMillis() + UNDERSCORE + pdfFile.getOriginalFilename();
         ReimbursementRequest reimbursement = reimbursementRequestMapper.mapReimbursementRequestDtoToReimbursement(dto, uniqueFileName, reimbursementType);
         ReimbursementRequest saved = reimbursementRequsetRepo.save(reimbursement);
@@ -240,6 +255,16 @@ public class ReimbursementRequestServiceImpl implements ReimbursementRequestServ
             throw new IllegalArgumentException(
                     messageSource.getMessage(INVALID_REQUEST_EMPLOYEE_ID, null, Locale.ENGLISH),
                     REQUEST_RAISED_BY_EMP_ID);
+        }
+    }
+
+    private void validateTravelRequestApproved(ObjectNode travelRequest, Long travelRequestId) {
+        String status = travelRequest.get(REQUEST_STATUS).asText();
+        if (!TRAVEL_REQUEST_APPROVED_STATUS.equals(status)) {
+            logger.warn("Travel request {} has status '{}' — reimbursement requires APPROVED status", travelRequestId, status);
+            throw new BadRequestException(
+                    messageSource.getMessage(TRAVEL_REQUEST_NOT_APPROVED, new Object[]{travelRequestId}, Locale.ENGLISH),
+                    TRAVEL_REQUEST_ID);
         }
     }
 

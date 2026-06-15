@@ -21,6 +21,7 @@ public class AppConstant {
     public static final String INVALID_TRAVEL_DESK_EXEC_ID = "invalid.travel.desk.exe.id";
     public static final String REIMBURSEMENT_REQUEST_ALREADY_PROCESSED = "reimbursement.request.already.processed";
     public static final String INVALID_PDF_FORMAT = "invalid.pdf.format";
+    public static final String TRAVEL_REQUEST_NOT_APPROVED = "travel.request.not.approved";
 
     //General Properties
     public static final String TRAVEL_REQUEST_ID = "Travel Request Id";
@@ -31,6 +32,8 @@ public class AppConstant {
     public static final String NEW = "New";
     public static final String FROM_DATE = "fromDate";
     public static final String TO_DATE = "toDate";
+    public static final String REQUEST_STATUS = "requestStatus";
+    public static final String TRAVEL_REQUEST_APPROVED_STATUS = "APPROVED";
     public static final String INVOICE_DATE = "Invoice Date";
     public static final String INVOICE_AMOUNT = "Invoice Amount";
     public static final String FOOD = "Food";

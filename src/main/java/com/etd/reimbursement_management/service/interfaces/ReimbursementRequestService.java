@@ -17,4 +17,6 @@ public interface ReimbursementRequestService {
 
     ReimbursementResponseDTO processReimbursement(Long reimbursementId, ProcessReimbursementDTO processReimbursementDTO);
 
+    List<ReimbursementResponseDTO> getMyReimbursements();
+
 }

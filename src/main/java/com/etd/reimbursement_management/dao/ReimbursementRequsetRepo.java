@@ -13,4 +13,7 @@ public interface ReimbursementRequsetRepo extends JpaRepository<ReimbursementReq
     @Query("SELECT rr from ReimbursementRequest rr where rr.travelRequestId = :travelRequestId")
     List<ReimbursementRequest> findByTravelRequestId(Long travelRequestId);
 
+    @Query("SELECT rr from ReimbursementRequest rr where rr.requestRaisedByEmployeeId = :employeeId ORDER BY rr.id DESC")
+    List<ReimbursementRequest> findByRequestRaisedByEmployeeId(Long employeeId);
+
 }
