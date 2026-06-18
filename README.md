@@ -31,8 +31,7 @@ Microservice responsible for managing employee travel expense reimbursements in 
 | Framework | Spring Boot 3.5.7 |
 | Build tool | Gradle (no wrapper JAR committed — use system `gradle`) |
 | Persistence | Spring Data JPA + Hibernate |
-| Database (dev) | H2 file-mode |
-| Database (prod) | MySQL (commented out — see Configuration) |
+| Database | MySQL 8 (own DB `reimbursement_management`) |
 | Security | Spring Security 6 + stateless JWT (JJWT 0.12.6, HMAC-SHA256) |
 | HTTP clients | Spring Cloud OpenFeign |
 | API docs | Springdoc OpenAPI (Swagger UI) |
@@ -67,18 +66,19 @@ Microservice responsible for managing employee travel expense reimbursements in 
 
 - Java 21
 - Gradle (system install)
-- account-management running (H2 TCP server on port 9092 — needed by auth-service)
+- MySQL 8 running on `localhost:3306` with a `reimbursement_management` database (username `root`)
+- account-management running (creates the shared `account_management` MySQL schema + seeds default users)
 - auth-service running on port 8080
 - travel-planner running on port 8082
 
 ### Startup Order
 
 ```
-1. account-management  → starts H2 TCP server (port 9092)
-2. auth-service        → connects to account-management H2
-3. travel-planner      → independent H2 file DB
-4. reservation-management
-5. reimbursement-management   ← this service (independent H2 file DB)
+1. account-management  → creates shared `account_management` MySQL schema + seeds default users
+2. auth-service        → connects to the same `account_management` MySQL DB (TCP 3306)
+3. travel-planner      → own MySQL DB `travel_planner`
+4. reservation-management → own MySQL DB `reservation_management`
+5. reimbursement-management   ← this service (own MySQL DB `reimbursement_management`)
 ```
 
 ### Run
@@ -92,13 +92,6 @@ gradle bootRun
 ```bash
 gradle build
 ```
-
-### H2 Console (dev)
-
-URL: `http://localhost:8084/h2-console`
-- JDBC URL: `jdbc:h2:file:~/data/reimbursement_management`
-- Username: `sa`
-- Password: _(blank)_
 
 ### Swagger UI
 
@@ -115,19 +108,12 @@ All settings in `src/main/resources/application.properties`:
 server.port=8084
 spring.application.name=reimbursement-management
 
-# H2 Database (dev)
-spring.datasource.url=jdbc:h2:file:~/data/reimbursement_management;AUTO_SERVER=TRUE
-spring.datasource.driver-class-name=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.h2.console.enabled=true
-
-# MySQL Database (prod — uncomment and add mysql-connector-j to build.gradle)
-# spring.datasource.url=jdbc:mysql://localhost:3306/reimbursement_management
-# spring.datasource.username=root
-# spring.datasource.password=<your-password>
-# spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+# MySQL Database (own DB: reimbursement_management)
+spring.datasource.url=jdbc:mysql://localhost:3306/reimbursement_management
+spring.datasource.username=root
+spring.datasource.password=<your-password>
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
 
 # JPA
 spring.jpa.hibernate.ddl-auto=update
@@ -167,7 +153,7 @@ Service Interface → Service Impl
      ↓                     ↓
 Mapper               Feign Clients (travel-planner, account-management, auth-service)
      ↓
-JPA Repository → H2 / MySQL
+JPA Repository → MySQL
 ```
 
 ### Package Layout
@@ -270,7 +256,7 @@ com.etd.reimbursement_management
 
 ### Authentication
 
-All endpoints except Swagger and H2 console require a valid JWT:
+All endpoints except Swagger require a valid JWT:
 ```
 Authorization: Bearer <token>
 ```
@@ -695,7 +681,3 @@ The DAO interface is named `ReimbursementRequsetRepo` (missing the 't' in "Reque
 ### Food + Water share a daily budget
 
 Food and Water are treated as a combined category for the daily ₹1,500 limit. You cannot have Food = ₹1,200 and Water = ₹1,000 on the same day — the combined total (₹2,200) exceeds ₹1,500. In practice this means only one Food or Water claim can be submitted per day.
-
-### H2 AUTO_SERVER
-
-`AUTO_SERVER=TRUE` in the H2 JDBC URL allows both Hibernate and the H2 console to access the file database simultaneously during development.
