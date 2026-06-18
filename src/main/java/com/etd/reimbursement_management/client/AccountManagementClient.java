@@ -11,4 +11,7 @@ public interface AccountManagementClient {
     @GetMapping("employees/{id}")
     ObjectNode getEmployeeById(@PathVariable("id") Long id);
 
+    @GetMapping("employees/me")
+    ObjectNode getMyEmployee();
+
 }

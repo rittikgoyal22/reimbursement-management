@@ -32,6 +32,13 @@ public class ReimbursementRequestController {
         this.reimbursementRequestService = reimbursementRequestService;
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<List<ReimbursementResponseDTO>> getMyReimbursements() {
+        logger.info("Inside Reimbursement Request Controller :: getMyReimbursements");
+        List<ReimbursementResponseDTO> reimbursements = reimbursementRequestService.getMyReimbursements();
+        return ResponseEntity.ok(reimbursements);
+    }
+
     @GetMapping("/{travelRequestId}/requests")
     public ResponseEntity<List<ReimbursementResponseDTO>> getAllReimbursementsByTravelRequestId(@PathVariable("travelRequestId") Long travelRequestId)
     {
